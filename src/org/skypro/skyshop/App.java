@@ -1,8 +1,11 @@
+package org.skypro.skyshop;
+
 import org.skypro.skyshop.basket.ProductBasket;
 import org.skypro.skyshop.product.Product;
 
-public class Main {
+public class App {
     public static void main(String[] args) {
+
         ProductBasket basket1 = new ProductBasket();
         Product milk = new Product("Молоко", 200);
         Product cheese = new Product("Сыр", 115);
