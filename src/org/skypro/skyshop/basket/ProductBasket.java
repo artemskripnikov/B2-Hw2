@@ -31,11 +31,17 @@ private int productCount = 0;
             System.out.println("В корзине пусто");
             return;
         }
+
+        int specialCount = 0;
         for (int i = 0; i < productCount; i++) {
             Product product = products[i];
-            System.out.println(product.getNameOfProduct() + ": " + product.getPriceOfProduct());
+            System.out.println(product.toString());
+            if (product.isSpecial()) {
+                specialCount++;
+            }
         }
         System.out.println("Итого: " + getTotalPrice());
+        System.out.println("Специальных товаров: " + specialCount);
     }
 
     public boolean containsProductByName(String productName) {
