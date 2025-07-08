@@ -2,39 +2,37 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 public class ProductBasket {
-    private static final int MAX_PRODUCTS = 5;
-private final Product[] products = new Product[MAX_PRODUCTS];
-private int productCount = 0;
+private final List<Product> products = new ArrayList<>();
 
     public void addProduct(Product product) {
         if (product == null) {
             throw new IllegalArgumentException("Продукт не может быть пустым.");
         }
-        if (productCount >= MAX_PRODUCTS) {
-            throw new IllegalStateException("Корзина переполнена");
-        }
-        products[productCount++] = product;
+        products.add(product);
     }
 
     public int getTotalPrice() {
         int total = 0;
-        for (int i = 0; i < productCount; i++) {
-            total += products[i].getPriceOfProduct();
-            
+        for (Product product : products) {
+            total += product.getPriceOfProduct();
         }
         return total;
     }
 
     public void printContents() {
-        if (productCount == 0) {
+        if (products.isEmpty()) {
             System.out.println("В корзине пусто");
             return;
         }
 
         int specialCount = 0;
-        for (int i = 0; i < productCount; i++) {
-            Product product = products[i];
+        for (Product product : products) {
             System.out.println(product.toString());
             if (product.isSpecial()) {
                 specialCount++;
@@ -48,8 +46,8 @@ private int productCount = 0;
         if (productName == null || productName.trim().isEmpty()) {
             return false;
         }
-        for (int i = 0; i < productCount; i++) {
-            if (productName.equalsIgnoreCase(products[i].getNameOfProduct())) {
+        for (Product product : products) {
+            if (productName.equalsIgnoreCase(product.getNameOfProduct())) {
                 return true;
             }
         }
@@ -57,9 +55,26 @@ private int productCount = 0;
     }
 
     public void clearAllProducts() {
-        for (int i = 0; i < productCount; i++) {
-            products[i] = null;
+        products.clear();
         }
-        productCount = 0;
+
+
+public List<Product> removeAllProductsByName(String name) {
+    List<Product> removedProducts = new ArrayList<>();
+    if (name == null || name.trim().isEmpty()) {
+        return removedProducts;
     }
+
+    Iterator<Product> iterator = products.iterator();
+    while (iterator.hasNext()) {
+        Product product = iterator.next();
+        if (name.equalsIgnoreCase(product.getName())) {
+            removedProducts.add(product);
+            iterator.remove();
+        }
+    }
+    return removedProducts;
+   }
 }
+
+
