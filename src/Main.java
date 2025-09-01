@@ -4,6 +4,7 @@ import org.skypro.skyshop.product.Exeption.BestResultNotFound;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,9 +16,9 @@ public class Main {
         searchEngine.add(new SimpleProduct("Яйца", 90));
         searchEngine.add(new DiscountedProduct("Молоко цельное", 140, 15));
         System.out.println("Все товары со словом 'молоко': ");
-        Map<String, Searchable> results = searchEngine.search("молоко");
-        for (Map.Entry<String, Searchable> entry : results.entrySet()) {
-            System.out.println(entry.getKey() + " - " + entry.getValue().getStringRepresentation());
+        Set<Searchable> results = searchEngine.search("молоко");
+        for (Searchable item : results) {
+            System.out.println(item.getStringRepresentation());
         }
         try {
             searchEngine.add(new DiscountedProduct("", 60, 5));
