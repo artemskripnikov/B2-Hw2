@@ -2,43 +2,51 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ProductBasket {
-private final List<Product> products = new ArrayList<>();
+    private final Map<String, List<Product>> productsMap = new HashMap<>();
 
     public void addProduct(Product product) {
         if (product == null) {
             throw new IllegalArgumentException("Продукт не может быть пустым.");
         }
-        products.add(product);
+        String name = product.getName().toLowerCase();
+        if (!productsMap.containsKey(name)) {
+            productsMap.put(name, new ArrayList<>());
+        }
+        productsMap.get(name).add(product);
     }
 
     public int getTotalPrice() {
         int total = 0;
-        for (Product product : products) {
-            total += product.getPriceOfProduct();
+        for (List<Product> productList : productsMap.values()) {
+            for (Product product : productList) {
+                total += product.getPriceOfProduct();
+            }
         }
         return total;
     }
 
     public void printContents() {
-        if (products.isEmpty()) {
+        if (productsMap.isEmpty()) {
             System.out.println("В корзине пусто");
             return;
         }
 
         int specialCount = 0;
-        for (Product product : products) {
-            System.out.println(product.toString());
-            if (product.isSpecial()) {
-                specialCount++;
+        int totalItems = 0;
+
+        for (List<Product> productList : productsMap.values()) {
+            for (Product product : productList) {
+                System.out.println(product.toString());
+                if (product.isSpecial()) {
+                    specialCount++;
+                }
+                totalItems++;
             }
         }
-        System.out.println("Итого: " + getTotalPrice());
+        System.out.println("Итого (" + totalItems + " товаров): " + getTotalPrice());
         System.out.println("Специальных товаров: " + specialCount);
     }
 
@@ -46,35 +54,22 @@ private final List<Product> products = new ArrayList<>();
         if (productName == null || productName.trim().isEmpty()) {
             return false;
         }
-        for (Product product : products) {
-            if (productName.equalsIgnoreCase(product.getNameOfProduct())) {
-                return true;
-            }
-        }
-        return false;
+        return productsMap.containsKey(productName.toLowerCase());
     }
+
 
     public void clearAllProducts() {
-        products.clear();
-        }
-
-
-public List<Product> removeAllProductsByName(String name) {
-    List<Product> removedProducts = new ArrayList<>();
-    if (name == null || name.trim().isEmpty()) {
-        return removedProducts;
+        productsMap.clear();
     }
 
-    Iterator<Product> iterator = products.iterator();
-    while (iterator.hasNext()) {
-        Product product = iterator.next();
-        if (name.equalsIgnoreCase(product.getName())) {
-            removedProducts.add(product);
-            iterator.remove();
+
+    public List<Product> removeAllProductsByName(String productName) {
+        if (productName == null || productName.trim().isEmpty()) {
+            return new ArrayList<>();
         }
+        List<Product> removed = productsMap.remove(productName.toLowerCase());
+        return removed != null ? removed : new ArrayList<>();
     }
-    return removedProducts;
-   }
 }
 
 

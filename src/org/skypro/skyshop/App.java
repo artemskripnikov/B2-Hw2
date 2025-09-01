@@ -5,6 +5,7 @@ import org.skypro.skyshop.product.*;
 import org.skypro.skyshop.product.Exeption.BestResultNotFound;
 
 import java.util.List;
+import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
@@ -17,9 +18,9 @@ public class App {
         searchEngine.add(new SimpleProduct("Яйца", 90));
         searchEngine.add(new DiscountedProduct("Молоко цельное", 140, 15));
         System.out.println("Все товары со словом 'молоко': ");
-        List<Searchable> milkResults = searchEngine.search("молоко");
-        for (Searchable item : milkResults) {
-            System.out.println(item.getStringRepresentation());
+        Map<String, Searchable> results = searchEngine.search("молоко");
+        for (Map.Entry<String, Searchable> entry : results.entrySet()) {
+            System.out.println(entry.getKey() + " - " + entry.getValue().getStringRepresentation());
         }
         try {
             searchEngine.add(new DiscountedProduct("", 60, 5));
@@ -36,15 +37,14 @@ public class App {
             System.out.println("Результаты поиска по 'молоко' : ");
             Searchable bestMilk = searchEngine.findBestMatch("молоко");
             System.out.println(bestMilk.getStringRepresentation());
-
-            System.out.println("Поиск несуществующего товара:");
         } catch (BestResultNotFound e) {
             System.out.println(e.getMessage());
         }
-        for (Searchable item : milkResults) {
-            if (item != null) {
-                System.out.println(item.getStringRepresentation());
-            }
+        try {
+            System.out.println("Поиск несуществующего товара:");
+            searchEngine.findBestMatch("колбаса");
+        } catch (BestResultNotFound e) {
+            System.out.println(e.getMessage());
         }
 
         SearchEngine searchEngine1 = new SearchEngine();
@@ -69,7 +69,9 @@ public class App {
 
         List<Product> removedApples = basket.removeAllProductsByName("яблоко");
         System.out.println("Удаленные продукты:");
-        removedApples.forEach(System.out::println);
+        for (Product product : removedApples) {
+            System.out.println(product);
+        }
 
         System.out.println("Корзина после удаления:");
         basket.printContents();
