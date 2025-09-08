@@ -3,6 +3,7 @@ package org.skypro.skyshop.product;
 import org.skypro.skyshop.product.Exeption.BestResultNotFound;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SearchEngine {
     private final Set<Searchable> searchables = new HashSet<>();
@@ -21,17 +22,11 @@ public class SearchEngine {
         }
 
         String lowerQuery = query.toLowerCase();
-        Set<Searchable> resultSet = new TreeSet<>();
 
-        for (Searchable item : searchables) {
-            if (item.getSearchTerm().toLowerCase().contains(lowerQuery)) {
-                resultSet.add(item);
-            }
-        }
-        return resultSet;
+        return searchables.stream()
+                .filter(item -> item.getSearchTerm().toLowerCase().contains(lowerQuery))
+                .collect(Collectors.toCollection(() -> new TreeSet<>()));
     }
-
-
 
 
     public Searchable findBestMatch(String searchQuery) throws BestResultNotFound {
@@ -41,20 +36,15 @@ public class SearchEngine {
             throw new BestResultNotFound(searchQuery);
         }
 
-        Searchable bestMatch = null;
-        int maxOccurrences = 0;
-        String lowerSearch = searchQuery.toLowerCase();
+        String lowerQuery = searchQuery.toLowerCase();
 
-        for (Searchable item : searchables) {
-            String searchTerm = item.getSearchTerm().toLowerCase();
-            int occurrences = countSubstringOccurrences(searchTerm, lowerSearch);
-
-            if (occurrences > maxOccurrences) {
-                maxOccurrences = occurrences;
-                bestMatch = item;
-            }
-        }
-       return bestMatch;
+        return results.stream()
+                .max((item1, item2) -> {
+                    int count1 = countSubstringOccurrences(item1.getSearchTerm().toLowerCase(), lowerQuery);
+                    int count2 = countSubstringOccurrences(item2.getSearchTerm().toLowerCase(), lowerQuery);
+                    return Integer.compare(count1, count2);
+                })
+                .orElseThrow(() -> new BestResultNotFound(searchQuery));
     }
 
     private int countSubstringOccurrences(String text, String substring) {
@@ -62,16 +52,18 @@ public class SearchEngine {
         int index = 0;
         int substringLength = substring.length();
 
-        if (substringLength == 0 ) {
+        if (substringLength == 0) {
             return 0;
         }
-        while ((index = text.indexOf(substring, index)) != -1 ) {
+        while ((index = text.indexOf(substring, index)) != -1) {
             count++;
             index += substringLength;
         }
         return count;
     }
 }
+
+
 
 
 
