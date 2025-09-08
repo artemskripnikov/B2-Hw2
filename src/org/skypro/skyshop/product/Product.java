@@ -36,4 +36,21 @@ public abstract  class Product implements Searchable {
     public String getNameOfProduct() {
         return nameOfProduct;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Product product = (Product) o;
+        return nameOfProduct.equalsIgnoreCase(nameOfProduct);
+    }
+
+    @Override
+    public int hashCode() {
+        return nameOfProduct.toLowerCase().hashCode();
+    }
 }
