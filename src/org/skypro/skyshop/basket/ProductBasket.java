@@ -12,20 +12,14 @@ public class ProductBasket {
             throw new IllegalArgumentException("Продукт не может быть пустым.");
         }
         String name = product.getName().toLowerCase();
-        if (!productsMap.containsKey(name)) {
-            productsMap.put(name, new ArrayList<>());
-        }
-        productsMap.get(name).add(product);
+        productsMap.computeIfAbsent(name, k -> new ArrayList<>()).add(product);
     }
 
     public int getTotalPrice() {
-        int total = 0;
-        for (List<Product> productList : productsMap.values()) {
-            for (Product product : productList) {
-                total += product.getPriceOfProduct();
-            }
-        }
-        return total;
+        return productsMap.values().stream()
+                .flatMap(List::stream)
+                .mapToInt(Product::getPriceOfProduct)
+                .sum();
     }
 
     public void printContents() {
@@ -34,20 +28,28 @@ public class ProductBasket {
             return;
         }
 
-        int specialCount = 0;
-        int totalItems = 0;
+        productsMap.values().stream()
+                .flatMap(List::stream)
+                .forEach(System.out::println);
 
-        for (List<Product> productList : productsMap.values()) {
-            for (Product product : productList) {
-                System.out.println(product.toString());
-                if (product.isSpecial()) {
-                    specialCount++;
-                }
-                totalItems++;
-            }
-        }
-        System.out.println("Итого (" + totalItems + " товаров): " + getTotalPrice());
+        int totalItems = getTotalItemCount();
+        int specialCount = getSpecialCount();
+
+        System.out.println("Итого (" + totalItems + "товаров): " + getTotalPrice());
         System.out.println("Специальных товаров: " + specialCount);
+    }
+
+    private int getTotalItemCount() {
+        return productsMap.values().stream()
+                .mapToInt(List::size)
+                .sum();
+    }
+
+    private int getSpecialCount() {
+        return (int) productsMap.values().stream()
+                .flatMap(List::stream)
+                .filter(Product::isSpecial)
+                .count();
     }
 
     public boolean containsProductByName(String productName) {
